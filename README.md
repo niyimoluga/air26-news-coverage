@@ -17,9 +17,9 @@ submission).
 
 - [x] Design document submitted (3 A4 pages)
 - [x] Environment + GitHub repo
-- [ ] P1 preprocessing (24 months → `docs_YYYY-MM.parquet`)
-- [ ] P2 story clustering (MinHash/LSH per month)
-- [ ] P3 queries + judgments
+- [x] P1 preprocessing: **170,781 docs** in 24 monthly files
+- [x] P2 story clustering: 124,409 clusters (7,939 cross-host)
+- [ ] P3 queries + judgments (seed list script ready)
 - [ ] P4–P11 retrieval, reranking, evaluation, analysis, packaging
 
 ## Repository layout
@@ -31,9 +31,11 @@ data/processed/            gitignored: docs_*, clusters_*, stats
 src/data/common.py         manifest, paths, normalisation, shingles
 src/data/preprocess.py     P1: filter shards into monthly docs parquet
 src/data/cluster.py        P2: exact + MinHash/LSH clustering per month
+src/queries/select_seeds.py P3 helper: ranked seed clusters for query authoring
 scripts/00_setup.sh        check env, create folders
 scripts/01_preprocess.sh   run P1
 scripts/02_cluster.sh      run P2
+scripts/03_seeds.sh        build queries/seed_candidates.csv
 tests/test_common.py       smoke tests
 ```
 
@@ -67,6 +69,9 @@ bash scripts/01_preprocess.sh
 
 # P2 — per-month story clusters (parallel over months)
 JOBS=8 bash scripts/02_cluster.sh
+
+# P3 — seed clusters for writing the 10 pilot + 50 evaluation queries
+bash scripts/03_seeds.sh
 
 # smoke tests
 python -m unittest discover -s tests -v

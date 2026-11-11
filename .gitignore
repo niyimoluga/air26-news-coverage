@@ -23,3 +23,7 @@ env/
 # local
 .env
 .DS_Store
+
+# query artifacts with article titles/snippets
+queries/seed_candidates.csv
+queries/candidates*.csv
