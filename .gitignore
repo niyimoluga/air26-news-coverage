@@ -1,0 +1,25 @@
+# data (never commit article text)
+data/raw/
+data/processed/
+*.parquet
+*.npy
+*.npz
+.cache/
+
+# results
+results/runs/
+results/metrics/
+results/figures/
+*.log
+
+# python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.venv/
+env/
+
+# local
+.env
+.DS_Store

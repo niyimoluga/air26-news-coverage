@@ -1,0 +1,16 @@
+# Torch: install the CUDA build first (cu124 matches the Artemis driver):
+#   pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+# Then:
+torch==2.6.0
+sentence-transformers==6.2.0
+bm25s==0.3.16
+datasketch==2.0.0
+ir-measures[pyndeval]==0.4.3
+pandas==3.1.1
+pyarrow==26.0.1
+numpy>=1.26
+scipy==1.17.1
+scikit-learn==1.9.1
+matplotlib==3.11.2
+pyyaml==6.0.3
+tqdm==4.70.1

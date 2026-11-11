@@ -1,0 +1,21 @@
+paths:
+  manifest: data/manifest.csv
+  cache_dir: /home/larry/infini-news/.cache/infini
+  docs_dir: data/processed
+  clusters_dir: data/processed
+  runs_dir: results/runs
+  metrics_dir: results/metrics
+  figures_dir: results/figures
+
+preprocess:
+  language: eng
+  min_chars: 300
+  max_chars: 20000
+  truncate_chars: 8000
+
+cluster:
+  shingle_size: 5
+  num_perm: 128
+  threshold: 0.8
+  max_chars: 2000
+  jobs: 8
