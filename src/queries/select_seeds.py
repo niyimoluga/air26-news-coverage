@@ -26,6 +26,9 @@ DEFAULT_BLOCKLIST = (
     r"obituary|classifieds|property for sale|real estate|recruitment|"
     r"sponsored|deal of the day|coupon|discount code|"
     r"prnewswire|business wire|globenewswire|accesswire|einpresswire|press release"
+    r"\bWFO\b|warnings?, watches|zone forecast|marine warning|coastal waters forecast|"
+    r"forecast discussion|hazardous weather outlook"
+    
 )
 
 

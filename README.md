@@ -19,7 +19,9 @@ submission).
 - [x] Environment + GitHub repo
 - [x] P1 preprocessing: **170,781 docs** in 24 monthly files
 - [x] P2 story clustering: 124,409 clusters (7,939 cross-host)
-- [ ] P3 queries + judgments (seed list script ready)
+- [x] P3 pilot queries (10) + seed helper
+- [x] P4 BM25 + dense on the 3 smoke-test months (seed hit 100 %, BM25 ~1 ms, dense ~12 ms)
+- [ ] P5 pilot judgments + reranker tuning
 - [ ] P4–P11 retrieval, reranking, evaluation, analysis, packaging
 
 ## Repository layout
@@ -32,10 +34,14 @@ src/data/common.py         manifest, paths, normalisation, shingles
 src/data/preprocess.py     P1: filter shards into monthly docs parquet
 src/data/cluster.py        P2: exact + MinHash/LSH clustering per month
 src/queries/select_seeds.py P3 helper: ranked seed clusters for query authoring
+src/retrieval/bm25.py      S1: BM25 index per month (bm25s)
+src/retrieval/dense.py     S2: MiniLM embeddings + cosine search
+src/retrieval/run_all.py   month-scoped runs, latency, seed check
 scripts/00_setup.sh        check env, create folders
 scripts/01_preprocess.sh   run P1
 scripts/02_cluster.sh      run P2
 scripts/03_seeds.sh        build queries/seed_candidates.csv
+scripts/04_retrieval.sh    run P4 on the pilot queries
 tests/test_common.py       smoke tests
 ```
 
@@ -73,6 +79,9 @@ JOBS=8 bash scripts/02_cluster.sh
 # P3 — seed clusters for writing the 10 pilot + 50 evaluation queries
 bash scripts/03_seeds.sh
 
+# P4 — BM25 + dense on the pilot queries (3 months)
+bash scripts/04_retrieval.sh --months 2023-01,2023-06,2024-01 --strict
+
 # smoke tests
 python -m unittest discover -s tests -v
 ```
@@ -84,7 +93,15 @@ data/processed/docs_YYYY-MM.parquet       # doc_id, month, host, title, text, da
 data/processed/clusters_YYYY-MM.parquet   # cluster_id, size, hosts, earliest dates, representative
 data/processed/corpus_stats.csv
 data/processed/cluster_stats.csv
+data/processed/emb_*.npy                  # cached MiniLM embeddings
+results/runs/bm25__none.parquet           # qid, system, month, doc_id, rank, score
+results/runs/dense__none.parquet
+results/runs/latency.csv
+results/runs/seed_check.csv
 ```
+
+P4 pilot result: seed cluster in top-100 for **10/10 queries** with both systems.
+BM25 median latency ≈1 ms/query; dense ≈12 ms/query (L40S, 3 months).
 
 For a quick check on three months:
 
