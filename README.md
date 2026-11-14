@@ -89,8 +89,9 @@ bash scripts/03_seeds.sh
 # P4 — BM25 + dense on the pilot queries (3 months)
 bash scripts/04_retrieval.sh --months 2023-01,2023-06,2024-01 --strict
 
-# P5 — pool + sheets; then people fill candidates.csv and double_candidates.csv
+# P5 — pool + sheets (refuses to overwrite existing annotations; FORCE=1 to reset)
 bash scripts/05_pool.sh
+# people fill queries/candidates.csv and queries/double_candidates.csv
 # after annotation:
 python -m src.queries.make_sheets --mode collect
 bash scripts/05_kappa.sh
@@ -122,7 +123,8 @@ P4 pilot result: seed cluster in top-100 for **10/10 queries** with both systems
 BM25 median latency ≈1 ms/query; dense ≈12 ms/query (L40S, 3 months).
 
 P5 pool result: **138 candidates** (11–15 per query), **30 double-judged**
-(3 per query). The seed cluster was outside the top-10 clusters for P09, so it
+(3 per query). `05_pool.sh` refuses to overwrite the sheets once
+`queries/candidates.csv` exists; use `FORCE=1` only to rebuild from scratch. The seed cluster was outside the top-10 clusters for P09, so it
 was force-included (`seed_forced=True`). P04 shows the expected fragmentation:
 the Monterey Park shooting appears as several single-article clusters plus one
 8-copy seed cluster; the `same_as` field will merge the wire copies.
