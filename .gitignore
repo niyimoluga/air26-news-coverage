@@ -27,3 +27,6 @@ env/
 # query artifacts with article titles/snippets
 queries/seed_candidates.csv
 queries/candidates*.csv
+
+# double-annotation sheet with titles/snippets
+queries/double_candidates.csv

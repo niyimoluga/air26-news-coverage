@@ -21,8 +21,9 @@ submission).
 - [x] P2 story clustering: 124,409 clusters (7,939 cross-host)
 - [x] P3 pilot queries (10) + seed helper
 - [x] P4 BM25 + dense on the 3 smoke-test months (seed hit 100 %, BM25 ~1 ms, dense ~12 ms)
-- [ ] P5 pilot judgments + reranker tuning
-- [ ] P4–P11 retrieval, reranking, evaluation, analysis, packaging
+- [x] P5 candidate pool + annotation sheets (**138 candidates**, 30 double)
+- [ ] P5 pilot judgments + κ (people, then `05_kappa.sh`)
+- [ ] P6–P11 retrieval, reranking, evaluation, analysis, packaging
 
 ## Repository layout
 
@@ -34,6 +35,10 @@ src/data/common.py         manifest, paths, normalisation, shingles
 src/data/preprocess.py     P1: filter shards into monthly docs parquet
 src/data/cluster.py        P2: exact + MinHash/LSH clustering per month
 src/queries/select_seeds.py P3 helper: ranked seed clusters for query authoring
+src/queries/build_candidates.py P5: top-10 clusters per system, union, cap 15
+src/queries/make_sheets.py P5: annotation sheets, collect judgments
+src/queries/validate_judgments.py P5: structural/grade checks
+src/queries/kappa.py       P5: Cohen's κ (unweighted + quadratic)
 src/retrieval/bm25.py      S1: BM25 index per month (bm25s)
 src/retrieval/dense.py     S2: MiniLM embeddings + cosine search
 src/retrieval/run_all.py   month-scoped runs, latency, seed check
@@ -42,6 +47,8 @@ scripts/01_preprocess.sh   run P1
 scripts/02_cluster.sh      run P2
 scripts/03_seeds.sh        build queries/seed_candidates.csv
 scripts/04_retrieval.sh    run P4 on the pilot queries
+scripts/05_pool.sh         P5 candidate pool + sheets
+scripts/05_kappa.sh        P5 validate + κ
 tests/test_common.py       smoke tests
 ```
 
@@ -82,6 +89,12 @@ bash scripts/03_seeds.sh
 # P4 — BM25 + dense on the pilot queries (3 months)
 bash scripts/04_retrieval.sh --months 2023-01,2023-06,2024-01 --strict
 
+# P5 — pool + sheets; then people fill candidates.csv and double_candidates.csv
+bash scripts/05_pool.sh
+# after annotation:
+python -m src.queries.make_sheets --mode collect
+bash scripts/05_kappa.sh
+
 # smoke tests
 python -m unittest discover -s tests -v
 ```
@@ -98,10 +111,21 @@ results/runs/bm25__none.parquet           # qid, system, month, doc_id, rank, sc
 results/runs/dense__none.parquet
 results/runs/latency.csv
 results/runs/seed_check.csv
+queries/candidates.csv                    # gitignored: 138 candidates, titles/snippets
+queries/double_candidates.csv             # gitignored: 30 rows for the second annotator
+queries/judgments.csv                     # grades (no article text)
+queries/judgments_double.csv              # second-annotator grades
+results/metrics/pilot_kappa.csv
 ```
 
 P4 pilot result: seed cluster in top-100 for **10/10 queries** with both systems.
 BM25 median latency ≈1 ms/query; dense ≈12 ms/query (L40S, 3 months).
+
+P5 pool result: **138 candidates** (11–15 per query), **30 double-judged**
+(3 per query). The seed cluster was outside the top-10 clusters for P09, so it
+was force-included (`seed_forced=True`). P04 shows the expected fragmentation:
+the Monterey Park shooting appears as several single-article clusters plus one
+8-copy seed cluster; the `same_as` field will merge the wire copies.
 
 For a quick check on three months:
 
