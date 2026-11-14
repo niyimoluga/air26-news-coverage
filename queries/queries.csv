@@ -1,11 +1,11 @@
 qid,text,style,month,time_hint,seed_cluster,seed_host,author,status
-P01,Hells Angels trial Spain,entity,2023-01,January 2023,2023-01-C01331,federalnewsnetwork.com,,draft
-P02,request for approval to send German-made battle tanks to the war in Eastern Europe,descriptive,2023-01,January 2023,2023-01-C03342,marketbeat.com,,draft
-P03,Iraq prime minister replaces central bank governor after currency drop,entity,2023-01,January 2023,2023-01-C00311,federalnewsnetwork.com,,draft
-P04,Biden junk fees Live Nation Ticketmaster,entity,2023-06,June 2023,2023-06-C00140,kmvt.com,,draft
-P05,inquiry finds former British prime minister misled parliament over lockdown parties,descriptive,2023-06,June 2023,2023-06-C00061,wxxinews.org,,draft
-P06,Daniel Penny grand jury indictment Jordan Neely,entity,2023-06,June 2023,2023-06-C00737,kunc.org,,draft
-P07,gunman in nightclub massacre expected to plead guilty,descriptive,2023-06,June 2023,2023-06-C01681,kfvs12.com,,draft
-P08,Greene Hunter Biden daughter House hearing,entity,2024-01,January 2024,2024-01-C00010,wivb.com,,draft
-P09,poll shows frontrunner slipping as rival gains ground in early primary state,descriptive,2024-01,January 2024,2024-01-C00078,wavy.com,,draft
-P10,congress leaders clash over spending deal as House conservatives push back,descriptive,2024-01,January 2024,2024-01-C00544,ourquadcities.com,,draft
+P01,Hells Angels trial Spain,entity,2023-01,Jan-23,2023-01-C01331,federalnewsnetwork.com,olaniyi,final
+P02,request for approval to send German-made battle tanks to the war in Eastern Europe,descriptive,2023-01,Jan-23,2023-01-C03342,marketbeat.com,mehdi,final
+P03,Iraq prime minister replaces central bank governor after currency drop,entity,2023-01,Jan-23,2023-01-C00311,federalnewsnetwork.com,mehdi,final
+P04,Lunar New Year shooting Monterey Park California,entity,2023-01,Jan-23,2023-01-C00279,pahomepage.com,uju,final
+P05,inquiry finds former British prime minister misled parliament over lockdown parties,descriptive,2023-06,Jun-23,2023-06-C00061,wxxinews.org,uju,final
+P06,Daniel Penny grand jury indictment Jordan Neely,entity,2023-06,Jun-23,2023-06-C00737,kunc.org,uju,final
+P07,gunman in nightclub massacre expected to plead guilty,descriptive,2023-06,Jun-23,2023-06-C01681,kfvs12.com,mehdi,final
+P08,South Africa genocide case Israel International Court of Justice,entity,2024-01,Jan-24,2024-01-C00211,kob.com,olaniyi,final
+P09,veteran head coach parts ways with his NFL team after more than two decades,descriptive,2024-01,Jan-24,2024-01-C00951,keyt.com,olaniyi,final
+P10,congress leaders clash over spending deal as House conservatives push back,descriptive,2024-01,Jan-24,2024-01-C00544,ourquadcities.com,uju,final

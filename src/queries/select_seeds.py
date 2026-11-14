@@ -28,6 +28,7 @@ DEFAULT_BLOCKLIST = (
     r"prnewswire|business wire|globenewswire|accesswire|einpresswire|press release"
     r"\bWFO\b|warnings?, watches|zone forecast|marine warning|coastal waters forecast|"
     r"forecast discussion|hazardous weather outlook"
+    r"|player props|current conditions|best bets|prop bets|parlay"
     
 )
 

@@ -117,11 +117,19 @@ per month; never merge clusters across months. The design document's
 "3-shard pilot (22,613 articles)" is a separate feasibility sample of three
 shards from one month; the 24-month run is the evaluation corpus.
 
-## Deviations from the design document
+## Deviations and known limitations
 
 Tracked in `projectIdeas/12_implementation_plan.md` §0 (reserve queries,
 S1/S2-only pilot pool, 1,080 judgment decisions, midterm timing). Copy that list
 here before the final submission.
+
+- Some wire stories fragment into several single-article clusters (e.g. the
+  Hunter Biden plea and the Fed explainer in the pilot). The annotation
+  `same_as` field records these; resolving them into one canonical `story_id`
+  is deferred to **G4 (07.12)**, before the evaluation qrels are built.
+- The pilot candidate pool is built from **S1/S2 only**. It is used only to
+  tune the reranker settings; the final pool uses S1–S4 and is never used for
+  the pilot κ.
 
 ## Generative AI statement
 
