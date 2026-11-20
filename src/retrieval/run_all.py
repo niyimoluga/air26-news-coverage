@@ -1,4 +1,10 @@
-"""S1/S2 retrieval over month-scoped pools.
+"""S1-S4 retrieval over month-scoped pools.
+
+Systems:
+    bm25          S1  keyword baseline (bm25s)
+    dense         S2  bi-encoder cosine search (MiniLM, numpy)
+    crossencoder  S3  cross-encoder reranking of the BM25 top-k
+    hybrid        S4  Reciprocal Rank Fusion of BM25 and dense
 
 Each query is retrieved only from the documents of its own month. The script
 asserts this, saves top-k runs, latency measurements and a seed-cluster sanity
@@ -6,7 +12,7 @@ check. It does not read the qrels.
 
 Usage:
     python -m src.retrieval.run_all --queries queries/queries.csv \
-        --systems bm25,dense --top-k 100
+        --systems bm25,dense,crossencoder,hybrid --top-k 100
 """
 
 from __future__ import annotations
@@ -22,7 +28,11 @@ import torch
 
 from ..data.common import load_config, resolve
 from .bm25 import BM25Retriever
+from .crossencoder import DEFAULT_MODEL as CE_MODEL, CrossEncoderRetriever, load_model as load_ce
 from .dense import DEFAULT_MODEL, DenseRetriever, encode_documents, load_model
+from .hybrid import rrf_fuse
+
+KNOWN_SYSTEMS = {"bm25", "dense", "crossencoder", "hybrid"}
 
 
 def load_queries(path: str | Path, status: str | None, months: str | None) -> pd.DataFrame:
@@ -84,15 +94,19 @@ def main() -> None:
     parser.add_argument("--queries", default="queries/queries.csv")
     parser.add_argument("--docs-dir", default=None)
     parser.add_argument("--out-dir", default=None)
-    parser.add_argument("--systems", default="bm25,dense")
+    parser.add_argument("--systems", default="bm25,dense",
+                        help="comma-separated subset of bm25,dense,crossencoder,hybrid")
     parser.add_argument("--top-k", type=int, default=100)
     parser.add_argument("--status", default=None,
-                        help="comma-separated status filter, e.g. draft or pilot")
+                        help="comma-separated status filter, e.g. pilot or eval")
     parser.add_argument("--months", default=None)
     parser.add_argument("--limit-queries", type=int, default=0)
     parser.add_argument("--latency-repeats", type=int, default=5)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--model", default=DEFAULT_MODEL)
+    parser.add_argument("--ce-model", default=CE_MODEL)
+    parser.add_argument("--ce-batch-size", type=int, default=32)
+    parser.add_argument("--rrf-k", type=int, default=60)
     parser.add_argument("--device", default=None)
     parser.add_argument("--overwrite-embeddings", action="store_true")
     parser.add_argument("--min-seed-hit", type=float, default=0.8)
@@ -113,12 +127,19 @@ def main() -> None:
         raise SystemExit("no queries selected")
 
     systems = [s.strip() for s in args.systems.split(",") if s.strip()]
-    unknown = set(systems) - {"bm25", "dense"}
+    unknown = set(systems) - KNOWN_SYSTEMS
     if unknown:
         raise ValueError(f"unknown systems: {sorted(unknown)}")
+    if not systems:
+        raise SystemExit("no systems selected")
+
+    needs_bm25 = bool({"bm25", "crossencoder", "hybrid"} & set(systems))
+    needs_dense = bool({"dense", "hybrid"} & set(systems))
+    needs_ce = "crossencoder" in systems
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
-    model = load_model(args.model, device=device) if "dense" in systems else None
+    model = load_model(args.model, device=device) if needs_dense else None
+    ce_model = load_ce(args.ce_model, device=device) if needs_ce else None
     print(f"[env] device={device} systems={systems} queries={len(queries)}")
 
     runs: dict[str, list[pd.DataFrame]] = {s: [] for s in systems}
@@ -130,6 +151,7 @@ def main() -> None:
         doc_ids = docs["doc_id"].astype(str).tolist()
         doc_id_set = set(doc_ids)
         cluster_of = dict(zip(doc_ids, docs["cluster_id"].astype(str)))
+        text_of = dict(zip(doc_ids, docs["text"].fillna("").astype(str).tolist()))
         texts = (
             docs["title"].fillna("").astype(str)
             + " "
@@ -137,29 +159,75 @@ def main() -> None:
         ).tolist()
 
         retrievers: dict[str, object] = {}
-        if "bm25" in systems:
+        if needs_bm25:
             started = time.perf_counter()
             retrievers["bm25"] = BM25Retriever(texts, doc_ids)
             print(f"[{month}] bm25 index: {len(doc_ids):,} docs in {time.perf_counter() - started:.1f}s")
-        if "dense" in systems:
+        if needs_dense:
             embeddings = embedding_cache(
                 month, docs, texts, docs_dir, model,
                 overwrite=args.overwrite_embeddings, batch_size=args.batch_size,
             )
             retrievers["dense"] = DenseRetriever(model, doc_ids, embeddings)
             print(f"[{month}] dense index: {embeddings.shape}")
+        if needs_ce:
+            retrievers["crossencoder"] = CrossEncoderRetriever(
+                ce_model, batch_size=args.ce_batch_size
+            )
+            print(f"[{month}] cross-encoder: {args.ce_model}")
 
         for query in month_queries.itertuples(index=False):
-            for system in systems:
-                retriever = retrievers[system]
+            base: dict[str, pd.DataFrame] = {}
+            base_ms: dict[str, float] = {}
+
+            if needs_bm25:
                 timings = []
-                result = None
                 for _ in range(max(1, args.latency_repeats)):
                     started = time.perf_counter()
-                    result = retriever.search(query.text, k=args.top_k)
+                    base["bm25"] = retrievers["bm25"].search(query.text, k=args.top_k)
                     timings.append((time.perf_counter() - started) * 1000.0)
-                assert result is not None
+                base_ms["bm25"] = float(np.median(timings))
 
+            if needs_dense:
+                timings = []
+                for _ in range(max(1, args.latency_repeats)):
+                    started = time.perf_counter()
+                    base["dense"] = retrievers["dense"].search(query.text, k=args.top_k)
+                    timings.append((time.perf_counter() - started) * 1000.0)
+                base_ms["dense"] = float(np.median(timings))
+
+            outputs: dict[str, tuple[pd.DataFrame, float]] = {}
+
+            if "bm25" in systems:
+                outputs["bm25"] = (base["bm25"], base_ms["bm25"])
+            if "dense" in systems:
+                outputs["dense"] = (base["dense"], base_ms["dense"])
+
+            if "crossencoder" in systems:
+                candidates = base["bm25"]
+                cand_ids = candidates["doc_id"].astype(str).tolist()
+                cand_texts = [text_of.get(d, "") for d in cand_ids]
+                timings = []
+                for _ in range(max(1, args.latency_repeats)):
+                    started = time.perf_counter()
+                    reranked = retrievers["crossencoder"].rerank(
+                        query.text, cand_ids, cand_texts, k=args.top_k
+                    )
+                    timings.append((time.perf_counter() - started) * 1000.0)
+                outputs["crossencoder"] = (reranked, float(np.median(timings)))
+
+            if "hybrid" in systems:
+                lists = {
+                    "bm25": base["bm25"]["doc_id"].astype(str).tolist(),
+                    "dense": base["dense"]["doc_id"].astype(str).tolist(),
+                }
+                started = time.perf_counter()
+                fused = rrf_fuse(lists, k=args.rrf_k, top_k=args.top_k)
+                fusion_ms = (time.perf_counter() - started) * 1000.0
+                total_ms = base_ms["bm25"] + base_ms["dense"] + fusion_ms
+                outputs["hybrid"] = (fused, total_ms)
+
+            for system, (result, median_ms) in outputs.items():
                 result = result.reset_index(drop=True)
                 result["rank"] = np.arange(1, len(result) + 1)
                 if not set(result["doc_id"]).issubset(doc_id_set):
@@ -167,15 +235,17 @@ def main() -> None:
                 result["qid"] = query.qid
                 result["system"] = system
                 result["month"] = month
-                runs[system].append(result[["qid", "system", "month", "doc_id", "rank", "score"]])
+                runs[system].append(
+                    result[["qid", "system", "month", "doc_id", "rank", "score"]]
+                )
 
                 latency_rows.append(
                     {
                         "qid": query.qid,
                         "system": system,
                         "month": month,
-                        "median_ms": float(np.median(timings)),
-                        "repeats": len(timings),
+                        "median_ms": median_ms,
+                        "repeats": max(1, args.latency_repeats),
                         "docs_in_pool": len(doc_ids),
                     }
                 )
@@ -185,7 +255,7 @@ def main() -> None:
                     ranks = [
                         int(rank)
                         for doc_id, rank in zip(result["doc_id"], result["rank"])
-                        if cluster_of.get(doc_id) == str(seed_cluster)
+                        if cluster_of.get(str(doc_id)) == str(seed_cluster)
                     ]
                     seed_rows.append(
                         {
@@ -214,14 +284,13 @@ def main() -> None:
         seeds = pd.DataFrame(seed_rows)
         seeds.to_csv(out_dir / "seed_check.csv", index=False)
         summary = seeds.groupby("system")["seed_hit"].mean().sort_index()
-        print("\n[seed check] share of pilot queries whose seed cluster is in top-k:")
+        print("\n[seed check] share of queries whose seed cluster is in top-k:")
         for system, rate in summary.items():
-            print(f"  {system:6s} {rate:.1%}")
+            print(f"  {system:12s} {rate:.1%}")
         low = summary[summary < args.min_seed_hit]
         if len(low) and args.strict:
             raise SystemExit(f"seed hit rate below {args.min_seed_hit:.0%}: {low.to_dict()}")
     else:
-        seeds = pd.DataFrame()
         print("[seed check] no seed_cluster column/values; skipped")
 
     if not latency.empty:

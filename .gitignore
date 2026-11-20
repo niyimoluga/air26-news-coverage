@@ -30,3 +30,8 @@ queries/candidates*.csv
 
 # double-annotation sheet with titles/snippets
 queries/double_candidates.csv
+
+# scratch
+see/
+see*.py
+queries/seed_shortlist.csv

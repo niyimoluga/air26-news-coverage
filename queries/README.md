@@ -5,6 +5,7 @@
 | File | Tracked? | Content |
 |---|---|---|
 | `seed_candidates.csv` | no (gitignored) | candidate seed clusters with title, URL, snippet |
+| `seed_shortlist.csv` | no (gitignored) | P6 richness-ranked seeds for the 50 evaluation queries |
 | `queries.csv` | yes | the 60 active queries + 10 reserve |
 | `candidates.csv` | no (gitignored) | pooled clusters per query for annotation |
 | `judgments.csv` | yes | raw annotator labels |
@@ -21,6 +22,19 @@ Filters: cluster size >= 5, >= 3 hostnames, size/hosts <= 10, blocklist for
 price pages, live blogs, listicles, etc. Writes `queries/seed_candidates.csv`
 (top 12 per month). Pick 3–5 per month for the 50 evaluation queries and 2–3 for
 the 10 pilot queries. Prefer clusters whose snippet describes a concrete event.
+
+For the 50 evaluation queries use the richness shortlist instead:
+
+```bash
+bash scripts/06_seeds_full.sh   # -> queries/seed_shortlist.csv, 8 per month
+```
+
+`n_headline_groups` counts how many distinct headlines in the same month cover
+the same event (title-token overlap). Prefer seeds with `n_headline_groups >= 3`:
+the pilot showed that raw cluster size is inflated by wire fragmentation, and a
+one-report event (P05: 13 clusters, 1 story) cannot support a coverage metric.
+`n_headline_groups = 1` means the event has a single headline, so a reranker has
+nothing to add; use those only as a fallback for months without richer seeds.
 
 ## Query authoring protocol
 

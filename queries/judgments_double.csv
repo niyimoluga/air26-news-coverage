@@ -1,31 +1,31 @@
 qid,cluster_id,grade,same_as,annotator,notes
-P01,2023-01-C05074,,,,
-P01,2023-01-C03599,,,,
-P01,2023-01-C01331,,,,
-P02,2023-01-C05000,,,,
-P02,2023-01-C04640,,,,
-P02,2023-01-C03342,,,,
-P03,2023-01-C00954,,,,
-P03,2023-01-C04460,,,,
-P03,2023-01-C00311,,,,
-P04,2023-01-C01668,,,,
-P04,2023-01-C01337,,,,
-P04,2023-01-C00279,,,,
-P05,2023-06-C00810,,,,
-P05,2023-06-C03589,,,,
-P05,2023-06-C00061,,,,
-P06,2023-06-C01352,,,,
-P06,2023-06-C00737,,,,
-P06,2023-06-C02494,,,,
-P07,2023-06-C05057,,,,
-P07,2023-06-C05022,,,,
-P07,2023-06-C01681,,,,
-P08,2024-01-C03152,,,,
-P08,2024-01-C01395,,,,
-P08,2024-01-C00211,,,,
-P09,2024-01-C00028,,,,
-P09,2024-01-C03641,,,,
-P09,2024-01-C00951,,,,
-P10,2024-01-C04292,,,,
-P10,2024-01-C04815,,,,
-P10,2024-01-C00544,,,,
+P01,2023-01-C05074,0,,Uju,Different murder case in Leicester; unrelated to the Hells Angels trial in Spain.
+P01,2023-01-C03599,0,,Uju,Different case involving abuse of migrant minors; unrelated to the Hells Angels trial.
+P01,2023-01-C01331,2,,Uju,
+P02,2023-01-C05000,2,,Uju,
+P02,2023-01-C04640,2,2023-01-C03342,Uju,Same AP wire story as the larger C03342 cluster; syndicated wording/title match.
+P02,2023-01-C03342,2,,Uju,
+P03,2023-01-C00954,0,,Uju,"Concerns Nigeria's central bank and currency policy, not Iraq."
+P03,2023-01-C04460,0,,Uju,"Concerns the Bank of Japan and market data, not Iraq."
+P03,2023-01-C00311,2,,Uju,
+P04,2023-01-C01668,2,,Uju,
+P04,2023-01-C01337,1,,Uju,"Related response to the Monterey Park shooting, but this is a company statement rather than coverage of the shooting itself."
+P04,2023-01-C00279,2,,Uju,Covers the Monterey Park shooting and its immediate effect on the local Asian community.
+P05,2023-06-C00810,2,,Uju,
+P05,2023-06-C03589,2,,Uju,
+P05,2023-06-C00061,2,,Uju,
+P06,2023-06-C01352,2,,Uju,
+P06,2023-06-C00737,2,,Uju,
+P06,2023-06-C02494,0,,Uju,"Concerns the Trump investigations and special counsel, not Daniel Penny or Jordan Neely."
+P07,2023-06-C05057,0,,Uju,"Concerns the migrant boat disaster in Greece, not the Colorado nightclub shooting."
+P07,2023-06-C05022,0,,Uju,"Concerns illegal tree felling in London, not a nightclub massacre."
+P07,2023-06-C01681,2,,Uju,
+P08,2024-01-C03152,1,,Uju,"Related opinion/background arguing for support of the case, but does not report the ICJ hearing or South Africa's presentation itself."
+P08,2024-01-C01395,2,,Uju,
+P08,2024-01-C00211,2,,Uju,
+P09,2024-01-C00028,2,,Uju,
+P09,2024-01-C03641,1,,Uju,Discusses possible next steps and speculation about Belichick coaching elsewhere; the departure itself is background.
+P09,2024-01-C00951,2,,Uju,
+P10,2024-01-C04292,2,,Uju,
+P10,2024-01-C04815,2,,Uju,
+P10,2024-01-C00544,2,,Uju,
