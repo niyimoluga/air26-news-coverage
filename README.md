@@ -21,11 +21,13 @@ submission).
 - [x] P2 story clustering: 124,409 clusters (7,939 cross-host)
 - [x] P3 pilot queries (10) + seed helper
 - [x] P4 BM25 + dense on the 3 smoke-test months (BM25 ~0.4 ms, dense ~12 ms)
-- [x] P6 S1-S4 on the 10 pilot queries: seed hit 9/10 BM25 & cross-encoder, 10/10 dense & hybrid
 - [x] P5 candidate pool + annotation sheets (**138 candidates**, 30 double)
 - [x] P5 pilot judgments + κ: **κ = 0.935** (quadratic 0.977), 96.7 % agreement, 29/30 pairs
 - [x] P5 pilot pass: **9/10 events** have ≥3 relevant stories (plan needs ≥8/10); P01 is the only failure
-- [ ] P6 50 evaluation queries + S1–S4 on all 24 months
+- [x] P6 S1-S4 on the 10 pilot queries: seed hit 9/10 BM25 & cross-encoder, 10/10 dense & hybrid
+- [x] P6 tooling: S3/S4 + 24-month runner + richness seed shortlist (192 seeds)
+- [x] P6 query allocation: 50 queries over 22 months, 25 entity / 25 descriptive (`queries/query_allocation.csv`)
+- [ ] P6 50 evaluation queries written + S1–S4 on all 60 queries
 - [ ] P7–P11 final pool, reranking, evaluation, analysis, packaging
 
 ## Repository layout
