@@ -1,63 +1,242 @@
-# Queries and judgments
+# AIR26 — Many Outlets, One Story
 
-## Files
+Course project for **Advanced Information Retrieval (TU Graz, WS 2026/27)**.
 
-| File | Tracked? | Content |
-|---|---|---|
-| `seed_candidates.csv` | no (gitignored) | candidate seed clusters with title, URL, snippet |
-| `seed_shortlist.csv` | no (gitignored) | P6 richness-ranked seeds for the 50 evaluation queries |
-| `queries.csv` | yes | the 60 active queries + 10 reserve |
-| `candidates.csv` | no (gitignored) | pooled clusters per query for annotation |
-| `judgments.csv` | yes | raw annotator labels |
-| `judgments_final.csv` | yes | adjudicated labels + canonical `story_id` |
-| `qrels_doc.csv` | yes | doc-level qrels, `iteration=story_id` |
+News search returns many copies of the same wire story, so a ranked list can look
+diverse while covering one story. This project builds a time-scoped test
+collection from the Infini-News (CC-News) corpus, groups near-duplicate articles
+into story clusters, judges relevance at the event level, and compares BM25,
+bi-encoder, cross-encoder and hybrid retrieval on classic relevance **and**
+coverage metrics. It then tests cheap rerankers (story cap, outlet cap,
+earliness prior) that trade a little relevance for better coverage.
 
-## Seed selection
+The submitted design document is in `docs/design_document.pdf` (add it before
+submission).
+
+## Status
+
+- [x] Design document submitted (3 A4 pages)
+- [x] Environment + GitHub repo
+- [x] P1 preprocessing: **170,781 docs** in 24 monthly files
+- [x] P2 story clustering: 124,409 clusters (7,939 cross-host)
+- [x] P3 pilot queries (10) + seed helper
+- [x] P4 BM25 + dense on the 3 smoke-test months (BM25 ~0.4 ms, dense ~12 ms)
+- [x] P6 S1-S4 on the 10 pilot queries: seed hit 9/10 BM25 & cross-encoder, 10/10 dense & hybrid
+- [x] P5 candidate pool + annotation sheets (**138 candidates**, 30 double)
+- [x] P5 pilot judgments + κ: **κ = 0.935** (quadratic 0.977), 96.7 % agreement, 29/30 pairs
+- [x] P5 pilot pass: **9/10 events** have ≥3 relevant stories (plan needs ≥8/10); P01 is the only failure
+- [ ] P6 50 evaluation queries + S1–S4 on all 24 months
+- [ ] P7–P11 final pool, reranking, evaluation, analysis, packaging
+
+## Repository layout
+
+```
+config/default.yaml        paths, filters, clustering parameters
+data/manifest.csv          24-shard sample (one shard per month, 2023-01–2024-12)
+data/processed/            gitignored: docs_*, clusters_*, stats
+src/data/common.py         manifest, paths, normalisation, shingles
+src/data/preprocess.py     P1: filter shards into monthly docs parquet
+src/data/cluster.py        P2: exact + MinHash/LSH clustering per month
+src/queries/select_seeds.py P3 helper: ranked seed clusters for query authoring
+src/queries/build_candidates.py P5: top-10 clusters per system, union, cap 15
+src/queries/make_sheets.py P5: annotation sheets, collect judgments
+src/queries/validate_judgments.py P5: structural/grade checks
+src/queries/kappa.py       P5: Cohen's κ (unweighted + quadratic)
+src/retrieval/bm25.py      S1: BM25 index per month (bm25s)
+src/retrieval/dense.py     S2: MiniLM embeddings + cosine search
+src/retrieval/crossencoder.py S3: cross-encoder reranking of the BM25 top-k
+src/retrieval/hybrid.py    S4: Reciprocal Rank Fusion of BM25 + dense
+src/retrieval/run_all.py   month-scoped runs for S1-S4, latency, seed check
+scripts/00_setup.sh        check env, create folders
+scripts/01_preprocess.sh   run P1
+scripts/02_cluster.sh      run P2
+scripts/03_seeds.sh        build queries/seed_candidates.csv
+scripts/04_retrieval.sh    run P4 on the pilot queries
+scripts/05_pool.sh         P5 candidate pool + sheets
+scripts/05_kappa.sh        P5 validate + κ
+scripts/06_seeds_full.sh   P6 richness-ranked seed shortlist (24 months)
+scripts/07_retrieval_full.sh P6 S1-S4 on all active queries, 24 months
+tests/test_common.py       smoke tests
+```
+
+## Data
+
+- Source: [ruggsea/infini-news-corpus](https://huggingface.co/datasets/ruggsea/infini-news-corpus)
+  (CC-News derived), paper arXiv:2605.18337.
+- Sample: 24 parquet shards, one per month, 2023-01–2024-12.
+- Raw rows 565,515 → **170,781 English articles** after the filters
+  (language `eng`, 300–20,000 chars, HTTP 200).
+- **Article text is not redistributed.** The repo ships only the manifest and
+  the download script. The derived metadata is used under the dataset terms.
+
+## Setup
 
 ```bash
+ssh artemis
+conda activate air26          # torch 2.6+cu124, sentence-transformers, bm25s, datasketch, ir_measures
+cd ~/air26-news-coverage
+bash scripts/00_setup.sh
+```
+
+If the cache with the 24 shards is not present, P1 downloads missing shards from
+Hugging Face (`--download`). Override the cache location with `CACHE_DIR=...`.
+
+## Run the pipeline
+
+```bash
+# P1 — 24 monthly docs files (expect 170,781 rows)
+bash scripts/01_preprocess.sh
+
+# P2 — per-month story clusters (parallel over months)
+JOBS=8 bash scripts/02_cluster.sh
+
+# P3 — seed clusters for writing the 10 pilot + 50 evaluation queries
 bash scripts/03_seeds.sh
+
+# P4 — BM25 + dense on the pilot queries (3 months)
+bash scripts/04_retrieval.sh --months 2023-01,2023-06,2024-01 --strict
+
+# P5 — pool + sheets (refuses to overwrite existing annotations; FORCE=1 to reset)
+bash scripts/05_pool.sh
+# people fill queries/candidates.csv and queries/double_candidates.csv
+# after annotation:
+python -m src.queries.make_sheets --mode collect
+bash scripts/05_kappa.sh
+
+# P6 — richness-ranked seed shortlist for the 50 evaluation queries
+bash scripts/06_seeds_full.sh
+# write the 50 evaluation queries into queries/queries.csv (status=eval)
+# then S1-S4 on all 60 active queries over all 24 months
+bash scripts/07_retrieval_full.sh --strict
+
+# smoke tests
+python -m unittest discover -s tests -v
 ```
 
-Filters: cluster size >= 5, >= 3 hostnames, size/hosts <= 10, blocklist for
-price pages, live blogs, listicles, etc. Writes `queries/seed_candidates.csv`
-(top 12 per month). Pick 3–5 per month for the 50 evaluation queries and 2–3 for
-the 10 pilot queries. Prefer clusters whose snippet describes a concrete event.
+Expected outputs:
 
-For the 50 evaluation queries use the richness shortlist instead:
+```
+data/processed/docs_YYYY-MM.parquet       # doc_id, month, host, title, text, dates, text_hash, cluster_id
+data/processed/clusters_YYYY-MM.parquet   # cluster_id, size, hosts, earliest dates, representative
+data/processed/corpus_stats.csv
+data/processed/cluster_stats.csv
+data/processed/emb_*.npy                  # cached MiniLM embeddings
+results/runs/bm25__none.parquet           # qid, system, month, doc_id, rank, score
+results/runs/dense__none.parquet
+results/runs/latency.csv
+results/runs/seed_check.csv
+queries/candidates.csv                    # gitignored: 138 candidates, titles/snippets
+queries/double_candidates.csv             # gitignored: 30 rows for the second annotator
+queries/judgments.csv                     # grades (no article text)
+queries/judgments_double.csv              # second-annotator grades
+results/metrics/pilot_kappa.csv
+```
+
+P4/P6 pilot result on the updated queries (v2): the seed cluster is in the
+top-100 for **9/10 queries** with BM25 and the cross-encoder, and **10/10**
+with dense and hybrid. The miss is P09 (Belichick): the query is descriptive
+("veteran head coach parts ways with his NFL team after more than two decades")
+and the seed article never says "veteran" or "parts ways"; BM25 ranks it 305,
+dense 31, hybrid 75. That is a real entity-vs-descriptive effect (RQ3), not a
+bug, and it is why the seed-hit threshold is 80 %.
+
+Median latency per query (L40S, 3 months, 100 candidates):
+
+| System | Median |
+|---|---|
+| BM25 (S1) | 0.4 ms |
+| Dense (S2) | 12.0 ms |
+| Cross-encoder (S3) | 116.5 ms |
+| Hybrid RRF (S4) | 12.7 ms |
+
+The cross-encoder is ~10x denser retrieval because it scores 100 query-document
+pairs per query; the hybrid number includes both base runs plus fusion.
+
+## Pilot evaluation (P5)
+
+Annotator 1 graded all 138 candidates; annotator 2 graded the 30-row double
+sheet without seeing the first set.
+
+| Metric | Value |
+|---|---|
+| Agreement | 96.7 % (29/30 pairs) |
+| Cohen's κ | **0.935** (quadratic-weighted 0.977) |
+| Confusion matrix | 7 (0,0), 3 (1,1), 1 (1,2), 19 (2,2) |
+| Grade spread | 84 × 2, 17 × 1, 37 × 0 |
+| Pilot pass | **9/10 events** with ≥3 relevant stories (plan: ≥8/10) |
+
+The single disagreement is the expected 1-vs-2 borderline; nobody confused
+different event (0) with same event (2). P01 (Hells Angels) is the only failure
+with 1 relevant story. It is a tuning query and is kept out of the 50
+evaluation queries.
+
+**The counts are inflated by wire-story fragmentation.** P05 looks like 13
+relevant clusters, but they are mostly rewrites of one report. Counting distinct
+headlines after merging outlet suffixes gives:
+
+| Query | Relevant clusters | Distinct headlines | Pass |
+|---|---|---|---|
+| P01 Hells Angels | 1 | 1 | no |
+| P02 Poland tanks | 10 | 7 | yes |
+| P03 Iraq central bank | 4 | 3 | yes |
+| P04 Lunar New Year shooting | 11 | 11 | yes |
+| P05 partygate report | 13 | 11 | yes |
+| P06 Daniel Penny | 6 | 5 | yes |
+| P07 Club Q plea | 4 | 3 | yes |
+| P08 South Africa v. Israel | 8 | 8 | yes |
+| P09 Belichick | 8 | 8 | yes |
+| P10 spending deal | 9 | 8 | yes |
+
+The pass is solid for P02, P04, P08, P09 and P10 (different developments) and
+thin for P03, P05, P06 and P07 (one report rewritten). For the 50 evaluation
+queries, seeds are therefore ranked by **distinct headlines per event**, not by
+raw cluster size (`scripts/06_seeds_full.sh`).
+
+P5 pool result: **138 candidates** (11–15 per query), **30 double-judged**
+(3 per query). `05_pool.sh` refuses to overwrite the sheets once
+`queries/candidates.csv` exists; use `FORCE=1` only to rebuild from scratch. The seed cluster was outside the top-10 clusters for P09, so it
+was force-included (`seed_forced=True`). P04 shows the expected fragmentation:
+the Monterey Park shooting appears as several single-article clusters plus one
+8-copy seed cluster; the `same_as` field will merge the wire copies.
+
+For a quick check on three months:
 
 ```bash
-bash scripts/06_seeds_full.sh   # -> queries/seed_shortlist.csv, 8 per month
+bash scripts/01_preprocess.sh --months 2023-01,2023-06,2024-01
+JOBS=3 bash scripts/02_cluster.sh --months 2023-01,2023-06,2024-01
 ```
 
-`n_headline_groups` counts how many distinct headlines in the same month cover
-the same event (title-token overlap). Prefer seeds with `n_headline_groups >= 3`:
-the pilot showed that raw cluster size is inflated by wire fragmentation, and a
-one-report event (P05: 13 clusters, 1 story) cannot support a coverage metric.
-`n_headline_groups = 1` means the event has a single headline, so a reranker has
-nothing to add; use those only as a fallback for months without richer seeds.
+## Multi-month notes
 
-## Query authoring protocol
+Each query is retrieved **only from its own month's pool**. Clustering is done
+per month; never merge clusters across months. The design document's
+"3-shard pilot (22,613 articles)" is a separate feasibility sample of three
+shards from one month; the 24-month run is the evaluation corpus.
 
-1. Read the seed title + snippet (open the URL if needed).
-2. Write what a reader would type after seeing a push notification.
-3. Do not copy the headline. Do not look at system outputs.
-4. `style=entity` for names/places/dates; `style=descriptive` without the main
-   entity names.
-5. Add a time hint (`time_hint=2024-03` or empty) for half of each style.
-6. Record `qid, text, style, month, time_hint, seed_cluster, seed_host, author,
-   status` (`pilot` / `eval` / `reserve`).
+## Deviations and known limitations
 
-Suggested IDs: `P01–P10` (pilot), `E01–E50` (evaluation), `R01–R10` (reserve).
+Tracked in `projectIdeas/12_implementation_plan.md` §0 (reserve queries,
+S1/S2-only pilot pool, 1,080 judgment decisions, midterm timing). Copy that list
+here before the final submission.
 
-## Judgments
+- Some wire stories fragment into several single-article clusters (e.g. the
+  Hunter Biden plea and the Fed explainer in the pilot). The annotation
+  `same_as` field records these; resolving them into one canonical `story_id`
+  is deferred to **G4 (07.12)**, before the evaluation qrels are built.
+- The pilot candidate pool is built from **S1/S2 only**. It is used only to
+  tune the reranker settings; the final pool uses S1–S4 and is never used for
+  the pilot κ.
 
-Annotate one row per candidate cluster:
+## Generative AI statement
 
-```
-qid, cluster_id, grade, same_as, annotator, double, notes
-```
+Fill this before submission: which tools were used (code scaffolding, debugging,
+documentation), what they contributed, and that the design document was written
+without AI support. All AI-assisted code must be reviewed by the team.
 
-`grade`: 2 = same event, 1 = related/different development, 0 = different.
-`same_as`: another cluster_id if the two are the same wire text under different
-headlines. Resolve merges into one canonical `story_id` before building qrels;
-`iteration=story_id` for alpha-nDCG.
+## Licence and citations
+
+Code: to be decided with the group (e.g. MIT). Data: see the Infini-News terms;
+do not redistribute article text. Cite Infini-News (arXiv:2605.18337),
+Sentence-BERT/MiniLM (arXiv:1908.10084), e5 (arXiv:2212.03533), the MS MARCO
+cross-encoder (arXiv:1901.04085), bm25s (arXiv:2407.03618) and ir_measures
+(ECIR 2022, doi:10.1007/978-3-030-99739-7_38) in the final README.
