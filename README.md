@@ -225,6 +225,10 @@ here before the final submission.
   Hunter Biden plea and the Fed explainer in the pilot). The annotation
   `same_as` field records these; resolving them into one canonical `story_id`
   is deferred to **G4 (07.12)**, before the evaluation qrels are built.
+- The seed blocklist was extended after "Today in History" columns and
+  "Playoffs and Super Bowl Odds" pages survived the first filter and scored
+  high on richness (they share boilerplate titles, not an event). Re-run
+  `scripts/03_seeds.sh`/`06_seeds_full.sh` after changing the blocklist.
 - The pilot candidate pool is built from **S1/S2 only**. It is used only to
   tune the reranker settings; the final pool uses S1–S4 and is never used for
   the pilot κ.

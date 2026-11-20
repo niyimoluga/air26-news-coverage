@@ -38,6 +38,10 @@ DEFAULT_BLOCKLIST = (
     r"\bWFO\b|warnings?, watches|zone forecast|marine warning|coastal waters forecast|"
     r"forecast discussion|hazardous weather outlook"
     r"|player props|current conditions|best bets|prop bets|parlay"
+    r"|today in history|on this day|this day in history|playoffs? and super bowl odds"
+    r"|super bowl odds|odds to win|betting odds|futures odds"
+    r"|best .{0,40}(presents|gifts?)|gift guide|valentine|ap photos|photo gallery"
+    r"|stock market today|market wrap|stocks to watch|earnings preview"
 )
 
 STOPWORDS = set(
