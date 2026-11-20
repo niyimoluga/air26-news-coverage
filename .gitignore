@@ -30,6 +30,7 @@ queries/candidates*.csv
 
 # double-annotation sheet with titles/snippets
 queries/double_candidates.csv
+queries/final_double_candidates.csv
 
 # scratch
 see/

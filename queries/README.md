@@ -9,6 +9,9 @@
 | `queries.csv` | yes | the 60 active queries + 10 reserve |
 | `candidates.csv` | no (gitignored) | pooled clusters per query for annotation |
 | `judgments.csv` | yes | raw annotator labels |
+| `candidates_final.csv` | no (gitignored) | final pool for the 50 evaluation queries |
+| `final_double_candidates.csv` | no (gitignored) | 20 % of the final pool for the second annotator |
+| `final_judgments.csv` | yes | final grades before adjudication |
 | `judgments_final.csv` | yes | adjudicated labels + canonical `story_id` |
 | `qrels_doc.csv` | yes | doc-level qrels, `iteration=story_id` |
 

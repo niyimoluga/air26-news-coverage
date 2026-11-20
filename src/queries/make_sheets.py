@@ -25,6 +25,11 @@ from ..data.common import resolve
 SLIM = ["qid", "cluster_id", "grade", "same_as", "annotator", "notes"]
 
 
+def _name(prefix: str, base: str) -> str:
+    """'final', 'judgments.csv' -> 'final_judgments.csv'."""
+    return f"{prefix}_{base}" if prefix else base
+
+
 def pick_double(candidates: pd.DataFrame, per_query: int, seed: int) -> pd.DataFrame:
     parts = []
     for _, group in candidates.groupby("qid", sort=True):
@@ -34,14 +39,14 @@ def pick_double(candidates: pd.DataFrame, per_query: int, seed: int) -> pd.DataF
 
 
 def init_sheets(candidates_path: Path, out_dir: Path, per_query: int, seed: int,
-                force: bool) -> None:
+                force: bool, prefix: str = "") -> None:
     candidates = pd.read_csv(candidates_path)
     for col in SLIM:
         if col not in candidates.columns:
             candidates[col] = ""
         candidates[col] = candidates[col].astype("object").fillna("")
 
-    double_path = out_dir / "double_candidates.csv"
+    double_path = out_dir / _name(prefix, "double_candidates.csv")
     if double_path.exists() and not force:
         raise SystemExit(f"{double_path} exists; pass --force to overwrite")
     double = pick_double(candidates, per_query, seed)
@@ -50,19 +55,19 @@ def init_sheets(candidates_path: Path, out_dir: Path, per_query: int, seed: int,
     double.to_csv(double_path, index=False)
 
     candidates.to_csv(candidates_path, index=False)
-    candidates[SLIM].to_csv(out_dir / "judgments.csv", index=False)
-    double[SLIM].to_csv(out_dir / "judgments_double.csv", index=False)
+    candidates[SLIM].to_csv(out_dir / _name(prefix, "judgments.csv"), index=False)
+    double[SLIM].to_csv(out_dir / _name(prefix, "judgments_double.csv"), index=False)
 
     print(f"[init] candidates: {len(candidates)} rows ({candidates.qid.nunique()} queries)")
     print(f"[init] double:     {len(double)} rows -> {double_path.name}")
-    print(f"[init] sheets:     judgments.csv, judgments_double.csv")
+    print(f"[init] sheets:     {_name(prefix, 'judgments.csv')}, {_name(prefix, 'judgments_double.csv')}")
     print("[next] fill candidates.csv (annotator 1) and double_candidates.csv (annotator 2),")
     print("       then run: python -m src.queries.make_sheets --mode collect")
 
 
 def collect(candidates_path: Path, out_dir: Path) -> None:
     candidates = pd.read_csv(candidates_path)
-    double_path = out_dir / "double_candidates.csv"
+    double_path = out_dir / _name(prefix, "double_candidates.csv")
     if not double_path.exists():
         raise SystemExit(f"missing {double_path}")
     double = pd.read_csv(double_path)
@@ -72,10 +77,10 @@ def collect(candidates_path: Path, out_dir: Path) -> None:
             raise SystemExit(f"{name}: empty grades remain")
         frame["grade"] = pd.to_numeric(frame["grade"], errors="coerce")
 
-    candidates[SLIM].to_csv(out_dir / "judgments.csv", index=False)
-    double[SLIM].to_csv(out_dir / "judgments_double.csv", index=False)
-    print(f"[collect] judgments.csv: {len(candidates)} rows")
-    print(f"[collect] judgments_double.csv: {len(double)} rows")
+    candidates[SLIM].to_csv(out_dir / _name(prefix, "judgments.csv"), index=False)
+    double[SLIM].to_csv(out_dir / _name(prefix, "judgments_double.csv"), index=False)
+    print(f"[collect] {_name(prefix, 'judgments.csv')}: {len(candidates)} rows")
+    print(f"[collect] {_name(prefix, 'judgments_double.csv')}: {len(double)} rows")
 
 
 def main() -> None:
@@ -86,15 +91,18 @@ def main() -> None:
     parser.add_argument("--double-per-query", type=int, default=3)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--prefix", default="",
+                        help="file prefix, e.g. 'final' -> final_judgments.csv")
     args = parser.parse_args()
 
     candidates_path = resolve(args.candidates)
     out_dir = resolve(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     if args.mode == "init":
-        init_sheets(candidates_path, out_dir, args.double_per_query, args.seed, args.force)
+        init_sheets(candidates_path, out_dir, args.double_per_query, args.seed,
+                    args.force, args.prefix)
     else:
-        collect(candidates_path, out_dir)
+        collect(candidates_path, out_dir, args.prefix)
 
 
 if __name__ == "__main__":

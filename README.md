@@ -58,7 +58,9 @@ scripts/05_pool.sh         P5 candidate pool + sheets
 scripts/05_kappa.sh        P5 validate + κ
 scripts/06_seeds_full.sh   P6 richness-ranked seed shortlist (24 months)
 scripts/07_retrieval_full.sh P6 S1-S4 on all active queries, 24 months
+scripts/08_pool_final.sh    P7 final pool (S1-S4) + final annotation sheets
 tests/test_common.py       smoke tests
+tests/test_retrieval.py    RRF fusion + seed richness tests
 ```
 
 ## Data
@@ -110,6 +112,9 @@ bash scripts/06_seeds_full.sh
 # write the 50 evaluation queries into queries/queries.csv (status=eval)
 # then S1-S4 on all 60 active queries over all 24 months
 bash scripts/07_retrieval_full.sh --strict
+
+# P7 — final pool from S1-S4 for the 50 evaluation queries
+bash scripts/08_pool_final.sh
 
 # smoke tests
 python -m unittest discover -s tests -v
