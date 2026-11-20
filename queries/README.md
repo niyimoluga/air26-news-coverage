@@ -49,6 +49,24 @@ nothing to add; use those only as a fallback for months without richer seeds.
 
 Suggested IDs: `P01–P10` (pilot), `E01–E50` (evaluation), `R01–R10` (reserve).
 
+## Query allocation (P6)
+
+`query_allocation.csv` fixes how many evaluation queries each month needs and
+who writes them, so the 50 queries stay balanced and no month is overloaded:
+
+| Column | Meaning |
+|---|---|
+| `month` | monthly pool the query is retrieved from |
+| `rich3`, `rich2` | seeds in that month with >=3 / >=2 distinct headlines |
+| `quota` | evaluation queries to write for that month |
+| `author` | who writes them |
+| `style_entity`, `style_descriptive` | required split for that month |
+
+22 months are used; 2024-03 and 2024-10 are skipped because every seed there
+has a single headline, so a coverage query would have nothing to cover. Totals:
+**50 queries, 25 entity / 25 descriptive**. Write queries in batches of 10 and
+mark `status=eval` when a batch is finished.
+
 ## Judgments
 
 Annotate one row per candidate cluster:
