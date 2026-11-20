@@ -59,6 +59,7 @@ scripts/05_kappa.sh        P5 validate + κ
 scripts/06_seeds_full.sh   P6 richness-ranked seed shortlist (24 months)
 scripts/07_retrieval_full.sh P6 S1-S4 on all active queries, 24 months
 scripts/08_pool_final.sh    P7 final pool (S1-S4) + final annotation sheets
+src/retrieval/embed_all.py  precompute MiniLM embeddings for all 24 months
 tests/test_common.py       smoke tests
 tests/test_retrieval.py    RRF fusion + seed richness tests
 ```
@@ -115,6 +116,9 @@ bash scripts/07_retrieval_full.sh --strict
 
 # P7 — final pool from S1-S4 for the 50 evaluation queries
 bash scripts/08_pool_final.sh
+
+# optional: precompute all embeddings (24 months, ~160 s on the L40S)
+python -m src.retrieval.embed_all
 
 # smoke tests
 python -m unittest discover -s tests -v
