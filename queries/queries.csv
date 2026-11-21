@@ -1,11 +1,71 @@
 qid,text,style,month,time_hint,seed_cluster,seed_host,author,status
-P01,Hells Angels trial Spain,entity,2023-01,Jan-23,2023-01-C01331,federalnewsnetwork.com,olaniyi,pilot
-P02,request for approval to send German-made battle tanks to the war in Eastern Europe,descriptive,2023-01,Jan-23,2023-01-C03342,marketbeat.com,mehdi,pilot
-P03,Iraq prime minister replaces central bank governor after currency drop,entity,2023-01,Jan-23,2023-01-C00311,federalnewsnetwork.com,mehdi,pilot
-P04,Lunar New Year shooting Monterey Park California,entity,2023-01,Jan-23,2023-01-C00279,pahomepage.com,uju,pilot
-P05,inquiry finds former British prime minister misled parliament over lockdown parties,descriptive,2023-06,Jun-23,2023-06-C00061,wxxinews.org,uju,pilot
-P06,Daniel Penny grand jury indictment Jordan Neely,entity,2023-06,Jun-23,2023-06-C00737,kunc.org,uju,pilot
-P07,gunman in nightclub massacre expected to plead guilty,descriptive,2023-06,Jun-23,2023-06-C01681,kfvs12.com,mehdi,pilot
-P08,South Africa genocide case Israel International Court of Justice,entity,2024-01,Jan-24,2024-01-C00211,kob.com,olaniyi,pilot
-P09,veteran head coach parts ways with his NFL team after more than two decades,descriptive,2024-01,Jan-24,2024-01-C00951,keyt.com,olaniyi,pilot
-P10,congress leaders clash over spending deal as House conservatives push back,descriptive,2024-01,Jan-24,2024-01-C00544,ourquadcities.com,uju,pilot
+P01,Hells Angels trial Spain,entity,2023-01,23-Jan,2023-01-C01331,federalnewsnetwork.com,olaniyi,pilot
+P02,request for approval to send German-made battle tanks to the war in Eastern Europe,descriptive,2023-01,23-Jan,2023-01-C03342,marketbeat.com,mehdi,pilot
+P03,Iraq prime minister replaces central bank governor after currency drop,entity,2023-01,23-Jan,2023-01-C00311,federalnewsnetwork.com,mehdi,pilot
+P04,Lunar New Year shooting Monterey Park California,entity,2023-01,23-Jan,2023-01-C00279,pahomepage.com,uju,pilot
+P05,inquiry finds former British prime minister misled parliament over lockdown parties,descriptive,2023-06,23-Jun,2023-06-C00061,wxxinews.org,uju,pilot
+P06,Daniel Penny grand jury indictment Jordan Neely,entity,2023-06,23-Jun,2023-06-C00737,kunc.org,uju,pilot
+P07,gunman in nightclub massacre expected to plead guilty,descriptive,2023-06,23-Jun,2023-06-C01681,kfvs12.com,mehdi,pilot
+P08,South Africa genocide case Israel International Court of Justice,entity,2024-01,24-Jan,2024-01-C00211,kob.com,olaniyi,pilot
+P09,veteran head coach parts ways with his NFL team after more than two decades,descriptive,2024-01,24-Jan,2024-01-C00951,keyt.com,olaniyi,pilot
+P10,congress leaders clash over spending deal as House conservatives push back,descriptive,2024-01,24-Jan,2024-01-C00544,ourquadcities.com,uju,pilot
+E01,NFL players disability benefits lawsuit league program,entity,2023-02,23-Feb,2023-02-C00061,npr.org,mehdi,eval
+E02,former professional players challenge the league over denied medical and disability support,descriptive,2023-02,23-Feb,2023-02-C00081,fox8live.com,mehdi,eval
+E03,Turkey Erdogan Islamic State leader killed Syria,entity,2023-05,23-May,2023-05-C00422,nbcwashington.com,mehdi,eval
+E04,failed regional bank is taken over and its deposits and assets are sold to a larger lender,descriptive,2023-05,23-May,2023-05-C03802,kob.com,mehdi,eval
+E05,Tropical Storm Idalia Florida evacuation forecast,entity,2023-08,23-Aug,2023-08-C00045,keyc.com,mehdi,eval
+E06,military aircraft crashes during overseas training exercise killing several service members,descriptive,2023-08,23-Aug,2023-08-C01303,dailyherald.com,mehdi,eval
+E07,Joe Flaherty SCTV actor death,entity,2024-04,24-Apr,2024-04-C00038,cbsnews.com,mehdi,eval
+E08,longtime casino landmark closes after decades of operation in a major gambling destination,descriptive,2024-04,24-Apr,2024-04-C00977,kaaltv.com,mehdi,eval
+E09,man is arrested after driving a vehicle into a federal law enforcement office entrance,descriptive,2024-04,24-Apr,2024-04-C00008,krtv.com,mehdi,eval
+E10,Trump presidential immunity Supreme Court appeal,entity,2024-02,24-Feb,2024-02-C00009,ideastream.org,mehdi,eval
+E11,Guantanamo 9/11 plotters guilty plea deal,entity,2024-08,24-Aug,2024-08-C01074,kbbi.org,mehdi,eval
+E12,regional killings raise fears that a wider Middle East conflict could erupt,descriptive,2024-08,24-Aug,2024-08-C00752,wwno.org,mehdi,eval
+E13,Netanyahu Israel Gaza operations Lebanon warning,entity,2024-06,24-Jun,2024-06-C01728,wsvn.com,mehdi,eval
+E14,drag racing champion remains in intensive care after a devastating track crash,descriptive,2024-06,24-Jun,2024-06-C04020,wduv.com,mehdi,eval
+E15,NASA astronauts Wilmore Williams stranded space station,entity,2024-09,24-Sep,2024-09-C00496,whio.com,mehdi,eval
+E16,golfer undergoes another lower back operation as uncertainty surrounds his return,descriptive,2024-09,24-Sep,2024-09-C00508,whio.com,mehdi,eval
+E17,Lula Amazon deforestation Indigenous affairs agency,entity,2023-01,23-Jan,2023-01-C01796,wlns.com,olaniyi,eval
+E18,family reacts after prosecutors charge one of the last surviving witnesses in a decades-old celebrity murder,descriptive,2023-09,23-Sep,2023-09-C00199,bucksherald.co.uk,olaniyi,eval
+E19,Detroit Lions Hendon Hooker NFL draft selection,entity,2023-04,23-Apr,2023-04-C00007,m.startribune.com,olaniyi,eval
+E20,teams use the later rounds to add college standouts and potential future starters,descriptive,2023-04,23-Apr,2023-04-C00299,sandiegouniontribune.com,olaniyi,eval
+E21,United States Women World Cup Lindsey Horan draw,entity,2023-07,23-Jul,2023-07-C00316,kstp.com,olaniyi,eval
+E22,national teams rely on emerging stars as the women’s international tournament unfolds,descriptive,2023-07,23-Jul,2023-07-C00049,sandiegouniontribune.com,olaniyi,eval
+E23,Philadelphia Phillies Miami Marlins MLB wild card,entity,2023-10,23-Oct,2023-10-C00073,wduv.com,olaniyi,eval
+E24,postseason baseball attendance reaches an unusual low at a playoff opener,descriptive,2023-10,23-Oct,2023-10-C01912,wcia.com,olaniyi,eval
+E25,Amy Yang KPMG Women PGA Championship victory,entity,2024-06,24-Jun,2024-06-C01497,kstp.com,olaniyi,eval
+E26,rain delay forces drivers to finish a major stock car race using wet weather tires,descriptive,2024-06,24-Jun,2024-06-C02358,ca.sports.yahoo.com,olaniyi,eval
+E27,historic hockey stick from a championship-clinching game sets a new auction record,descriptive,2024-06,24-Jun,2024-06-C00093,actionnewsjax.com,olaniyi,eval
+E28,TikTok United States ban First Amendment court challenge,entity,2024-05,24-May,2024-05-C00085,kvcrnews.org,olaniyi,eval
+E29,scouting organization changes its identity as it seeks to become more inclusive,descriptive,2024-05,24-May,2024-05-C00322,time.com,olaniyi,eval
+E30,Katie Ledecky Paris Olympics 1500m gold medal,entity,2024-08,24-Aug,2024-08-C01202,kdlg.org,olaniyi,eval
+E31,consumer agency says online marketplace must recall dangerous goods sold by outside merchants,descriptive,2024-08,24-Aug,2024-08-C02440,wknofm.org,olaniyi,eval
+E32,Luigi Mangione Karen Friedman Agnifilo defense lawyer,entity,2024-12,24-Dec,2024-12-C02161,kvnf.org,olaniyi,eval
+E33,Jamie Foxx Beverly Hills restaurant birthday dinner incident,entity,2024-12,24-Dec,2024-12-C01473,6abc.com,olaniyi,eval
+E34,lawmakers remove the country’s president after a controversial emergency rule declaration,descriptive,2024-12,24-Dec,2024-12-C00394,wdiy.org,olaniyi,eval
+E35,Florida Atlantic Owls NCAA Final Four first appearance,entity,2023-03,23-Mar,2023-03-C00204,binghamtonhomepage.com,uju,eval
+E36,Miami Hurricanes Texas Elite Eight comeback Final Four,entity,2023-03,23-Mar,2023-03-C00307,myfox8.com,uju,eval
+E37,women’s basketball team advances to the national semifinals after a hard-fought tournament victory,descriptive,2023-03,23-Mar,2023-03-C00334,binghamtonhomepage.com,uju,eval
+E38,San Diego State Creighton NCAA Final Four victory,entity,2023-03,23-Mar,2023-03-C00091,binghamtonhomepage.com,uju,eval
+E39,television network agrees to contribute to a president-elect’s future library to resolve a defamation dispute,descriptive,2024-12,24-Dec,2024-12-C01540,latimes.com,uju,eval
+E40,Europe Ryder Cup Hovland Aberg golf partnership,entity,2023-09,23-Sep,2023-09-C00002,wpxi.com,uju,eval
+E41,European golfers build a commanding advantage over their rivals in team competition,descriptive,2023-09,23-Sep,2023-09-C01092,krqe.com,uju,eval
+E42,Harvard Claudine Gay antisemitism testimony president,entity,2023-12,23-Dec,2023-12-C00267,wdtv.com,uju,eval
+E43,Ukrainian leader presses foreign allies for additional military support,descriptive,2023-12,23-Dec,2023-12-C00012,capeandislands.org,uju,eval
+E44,faculty members rally behind university leader after congressional testimony draws criticism,descriptive,2023-12,23-Dec,2023-12-C00760,upmatters.com,uju,eval
+E45,Baltimore Francis Scott Key Bridge collapse economic impact,entity,2024-04,24-Apr,2024-04-C02843,wwno.org,uju,eval
+E46,aid groups suspend relief work after their staff are killed in an airstrike,descriptive,2024-04,24-Apr,2024-04-C00152,whec.com,uju,eval
+E47,Keir Starmer Rishi Sunak UK election campaign,entity,2024-07,24-Jul,2024-07-C01248,abcnews.go.com,uju,eval
+E48,deadly religious gathering stampede prompts scrutiny of crowd control and emergency exits,descriptive,2024-07,24-Jul,2024-07-C01409,abcnews.go.com,uju,eval
+E49,Justin Trudeau Donald Trump Mar-a-Lago tariffs meeting,entity,2024-11,24-Nov,2024-11-C00336,cfpublic.org,uju,eval
+E50,rebels enter a major city as government forces struggle to regain control,descriptive,2024-11,24-Nov,2024-11-C00129,kob.com,uju,eval
+R01,San Diego State Creighton NCAA Final Four victory,entity,2023-03,23-Mar,2023-03-C00091,binghamtonhomepage.com,uju,reserve
+R02,First Citizens takes over failed Silicon Valley Bank deposits loans,entity,2023-03,23-Mar,2023-03-C00228,azfamily.com,olaniyi,reserve
+R03,Erdogan Turkish forces Islamic State chief killing,entity,2023-05,23-May,2023-05-C01727,newschainonline.com,mehdi,reserve
+R04,European team extends its advantage during the weekend’s international golf competition,descriptive,2023-09,23-Sep,2023-09-C02896,k99online.com,uju,reserve
+R05,Harvard Claudine Gay congressional testimony leadership decision,entity,2023-12,23-Dec,2023-12-C00505,kristv.com,olaniyi,reserve
+R06,president makes urgent appeal for additional military assistance during ongoing invasion,descriptive,2023-12,23-Dec,2023-12-C02290,kanw.com,mehdi,reserve
+R07,Trump Supreme Court presidential immunity election case,entity,2024-02,24-Feb,2024-02-C00380,wrtv.com,uju,reserve
+R08,friends describe the accused executive killer before his arrest and court proceedings,descriptive,2024-12,24-Dec,2024-12-C01279,nbcdfw.com,mehdi,reserve
+R09,actor receives medical treatment after an altercation at a restaurant birthday gathering,descriptive,2024-12,24-Dec,2024-12-C02100,nbcconnecticut.com,olaniyi,reserve
+R10,television network agrees to pay toward a president-elect’s library to settle a defamation lawsuit,descriptive,2024-12,24-Dec,2024-12-C01540,latimes.com,uju,reserve

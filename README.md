@@ -26,9 +26,12 @@ submission).
 - [x] P5 pilot pass: **9/10 events** have ≥3 relevant stories (plan needs ≥8/10); P01 is the only failure
 - [x] P6 S1-S4 on the 10 pilot queries: seed hit 9/10 BM25 & cross-encoder, 10/10 dense & hybrid
 - [x] P6 tooling: S3/S4 + 24-month runner + richness seed shortlist (192 seeds)
-- [x] P6 query allocation: 50 queries over 22 months, 25 entity / 25 descriptive (`queries/query_allocation.csv`)
-- [ ] P6 50 evaluation queries written + S1–S4 on all 60 queries
-- [ ] P7–P11 final pool, reranking, evaluation, analysis, packaging
+- [x] P6 query allocation: 50 queries over 19 months, 25 entity / 25 descriptive (`queries/query_allocation.csv`)
+- [x] P6 50 evaluation queries + 10 reserve written and checked (`scripts/check_queries.py`)
+- [x] P6 S1–S4 on all 60 active queries: 6,000 rows/system, seed hit 95 % BM25/S3, 100 % dense/hybrid
+- [x] P7 final pool: **718 candidates** (50 evaluation queries) + **150 double** (3 per query)
+- [ ] P7 annotation: **0/718 graded** — window 24.11–07.12, at least half by 01.12 (G3)
+- [ ] G4 collect + κ + story merge; P8 rerankers; P9 metrics; analysis and packaging
 
 ## Repository layout
 
@@ -140,6 +143,10 @@ queries/candidates.csv                    # gitignored: 138 candidates, titles/s
 queries/double_candidates.csv             # gitignored: 30 rows for the second annotator
 queries/judgments.csv                     # grades (no article text)
 queries/judgments_double.csv              # second-annotator grades
+queries/candidates_final.csv              # gitignored: 718 candidates (final pool)
+queries/final_double_candidates.csv       # gitignored: 150 rows (3 per query)
+queries/final_judgments.csv               # grades after collect (no article text)
+queries/final_judgments_double.csv        # second-annotator grades after collect
 results/metrics/pilot_kappa.csv
 ```
 
@@ -224,6 +231,33 @@ per month; never merge clusters across months. The design document's
 "3-shard pilot (22,613 articles)" is a separate feasibility sample of three
 shards from one month; the 24-month run is the evaluation corpus.
 
+## Final annotation (P7)
+
+`scripts/08_pool_final.sh` pooled the top-10 clusters of all four systems for
+the 50 evaluation queries, deduplicated and capped at 15:
+
+| Sheet | Rows | Who fills it | Status |
+|---|---|---|---|
+| `queries/candidates_final.csv` | 718 | three annotators, one share of queries each | 0 graded |
+| `queries/final_double_candidates.csv` | 150 | a different person per query, independently | 0 graded |
+
+Columns to fill: `grade`, `same_as`, `annotator`, `notes`. Grades follow the
+pilot guide (2 = same event, 1 = related but different development,
+0 = different event). After annotation, `make_sheets --mode collect
+--prefix final` writes the slim `final_judgments*.csv` files.
+
+**Do not confuse the two pairs of files.** `candidates_final.csv` and
+`final_double_candidates.csv` are the sheets people edit (they contain titles
+and snippets, so they are gitignored). `final_judgments.csv` and
+`final_judgments_double.csv` are the slim collect output (IDs and grades only,
+tracked in git). `make_sheets --mode init` writes a blank placeholder
+`final_judgments.csv`; it is overwritten by `collect` and should not be filled
+by hand.
+
+Annotation window: **24.11 – 07.12**, with at least half of the 718 rows done
+by **01.12 (G3)**. G4 on 07.12 collects the sheets, recomputes κ and runs the
+`story_id` merge before the qrels are built.
+
 ## Deviations and known limitations
 
 Tracked in `projectIdeas/12_implementation_plan.md` §0 (reserve queries,
@@ -241,6 +275,20 @@ here before the final submission.
 - The pilot candidate pool is built from **S1/S2 only**. It is used only to
   tune the reranker settings; the final pool uses S1–S4 and is never used for
   the pilot κ.
+- **Cross-encoder input (open).** The design document says S3 reranks the
+  top-100 of **S2 (dense)**; the code reranks the top-100 of **BM25**
+  (`src/retrieval/crossencoder.py`, `--base bm25`). Pick one and align code or
+  document. The pilot numbers above were produced with the BM25 base.
+- **Pool size (open).** The design document estimates ~900 cluster decisions
+  (750 evaluation + 150 pilot). The actual final pool is **718 evaluation +
+  150 double-judged = 868 decisions**, and the 10 pilot queries are not in the
+  final pool. Update the document's estimate or cite the real count.
+- **Reserve duplicates (open).** `R01` is an exact duplicate of `E38` (same seed
+  cluster `2023-03-C00091`, text similarity 1.00) and `R10` is a near-duplicate
+  of `E39` (0.81). Replace or re-seed them before using the reserves.
+- **Query months.** The 50 evaluation queries cover **19** of the 24 months
+  (not 22 as an earlier draft said); five months have no evaluation query.
+  `queries/query_allocation.csv` lists the per-month target.
 
 ## Generative AI statement
 
