@@ -231,6 +231,27 @@ per month; never merge clusters across months. The design document's
 "3-shard pilot (22,613 articles)" is a separate feasibility sample of three
 shards from one month; the 24-month run is the evaluation corpus.
 
+## Full run (P6): 60 queries, 24 months
+
+`scripts/07_retrieval_full.sh --strict` ran S1–S4 on the 10 pilot + 50
+evaluation queries (60 active; the 10 reserves are not run), each query against
+its own month's pool. Output: **6,000 rows per system** (60 × top-100).
+
+| System | Seed in top-100 | Median latency | Median seed rank |
+|---|---|---|---|
+| BM25 (S1) | 95 % (57/60) | 0.86 ms | 3 |
+| Dense (S2) | 100 % (60/60) | 12.0 ms | 5 |
+| Cross-encoder (S3) | 95 % (57/60) | 117.1 ms | 3 |
+| Hybrid RRF (S4) | 100 % (60/60) | 13.1 ms | 3 |
+
+Three queries miss the seed for BM25 and the cross-encoder: P09 (Belichick,
+BM25 rank 305) and two descriptive queries whose seeds sit outside the top-100.
+That is the 80 % threshold doing its job, not a bug. Top-10 overlap between
+systems is 35–67 %, so the four lists really differ.
+
+The 0.4 ms BM25 figure in the pilot table above is the 3-month pilot; the full
+24-month run is 0.86 ms (larger monthly pools).
+
 ## Final annotation (P7)
 
 `scripts/08_pool_final.sh` pooled the top-10 clusters of all four systems for
