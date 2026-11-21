@@ -308,8 +308,13 @@ here before the final submission.
   cluster `2023-03-C00091`, text similarity 1.00) and `R10` is a near-duplicate
   of `E39` (0.81). Replace or re-seed them before using the reserves.
 - **Query months.** The 50 evaluation queries cover **19** of the 24 months
-  (not 22 as an earlier draft said); five months have no evaluation query.
-  `queries/query_allocation.csv` lists the per-month target.
+  (not 22 as an earlier draft said). Five months have no evaluation query:
+  **2023-06, 2023-11, 2024-01, 2024-03, 2024-10**, and the 10 reserves do not
+  cover them either (they sit in 2023-03, 2023-05, 2023-09, 2023-12, 2024-02,
+  2024-12). Either add five queries for those months or state the 19/24
+  coverage as a limitation. Fix this **before** annotation starts: the pool is
+  rebuilt from the queries, so a change now costs only `FORCE=1
+  bash scripts/08_pool_final.sh` (nothing is graded yet).
 
 ## Generative AI statement
 
